@@ -1,0 +1,42 @@
+# ------------------------
+# Environnements & secrets
+# ------------------------
+.env
+.env.*
+!.env.dist
+
+# Fichiers temporaires d'éditeur (vim, etc.)
+*.swp
+*.swo
+*~
+
+# ------------------------
+# Dépendances & build
+# ------------------------
+/vendor/
+/node_modules/
+
+# Build front (si tu en as)
+/public/build/
+/public/bundles/
+
+# ------------------------
+# Symfony : cache, logs, etc.
+# ------------------------
+/var/
+
+# ------------------------
+# IDE / OS crap
+# ------------------------
+/.idea/
+/.vscode/
+/.nbproject/
+/.DS_Store
+Thumbs.db
+
+# ------------------------
+# Tests / outils
+# ------------------------
+/phpunit.result.cache
+/.phpunit.cache/
+/coverage/
