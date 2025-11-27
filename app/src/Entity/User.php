@@ -33,6 +33,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?string $password = null;
 
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $favoriteKeywords = null;
+
+    // ---------------------
+    // Getters / Setters
+    // ---------------------
+
     public function getId(): ?int
     {
         return $this->id;
@@ -52,8 +59,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * A visual identifier that represents this user.
-     *
-     * @see UserInterface
      */
     public function getUserIdentifier(): string
     {
@@ -97,8 +102,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    // ---------------------
+    // Favorite Keywords
+    // ---------------------
+
+    public function getFavoriteKeywords(): ?string
+    {
+        return $this->favoriteKeywords;
+    }
+
+    public function setFavoriteKeywords(?string $favoriteKeywords): self
+    {
+        $this->favoriteKeywords = $favoriteKeywords;
+        return $this;
+    }
+
     /**
-     * Ensure the session doesn't contain actual password hashes by CRC32C-hashing them, as supported since Symfony 7.3.
+     * Ensure password hash is not stored in session.
      */
     public function __serialize(): array
     {
@@ -111,6 +131,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[\Deprecated]
     public function eraseCredentials(): void
     {
-        // @deprecated, to be removed when upgrading to Symfony 8
+        // @deprecated, will be removed in Symfony 8
     }
 }

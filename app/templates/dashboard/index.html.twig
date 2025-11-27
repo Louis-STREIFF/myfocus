@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}News{% endblock %}
+
+{% block body %}
+<div class="container py-4">
+    <h1 class="mb-4">News{% if keywords %} : {{ keywords }}{% endif %}</h1>
+
+    {% if news is empty %}
+        <p class="text-muted">Aucune news trouvée. Configure tes mots clés dans ton profil.</p>
+    {% else %}
+        <ul class="list-group">
+            {% for article in news %}
+                <li class="list-group-item">
+                    <a href="{{ article.url }}" target="_blank" class="fw-bold">{{ article.title }}</a>
+                    <div class="text-muted small">
+                        {{ article.source.name }}
+                        — {{ article.publishedAt|date('d/m/Y H:i') }}
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</div>
+{% endblock %}
