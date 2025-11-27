@@ -68,7 +68,7 @@
         <parameter key="namespace">Symfony\Bundle\SecurityBundle</parameter>
       </parameter>
       <parameter key="MonologBundle" type="collection">
-        <parameter key="path">/var/www/app/vendor/symfony/monolog-bundle</parameter>
+        <parameter key="path">/var/www/app/vendor/symfony/monolog-bundle/src</parameter>
         <parameter key="namespace">Symfony\Bundle\MonologBundle</parameter>
       </parameter>
       <parameter key="MakerBundle" type="collection">
@@ -241,7 +241,6 @@
     </parameter>
     <parameter key="security.logout_uris" type="collection"/>
     <parameter key="monolog.use_microseconds">true</parameter>
-    <parameter key="monolog.swift_mailer.handlers" type="collection"/>
     <parameter key="monolog.handlers_to_channels" type="collection">
       <parameter key="monolog.handler.console" type="collection">
         <parameter key="type">exclusive</parameter>
@@ -2442,7 +2441,7 @@
           <argument>/var/www/app/vendor/symfony/ux-turbo/translations</argument>
           <argument>/var/www/app/vendor/twig/extra-bundle/translations</argument>
           <argument>/var/www/app/vendor/symfony/security-bundle/translations</argument>
-          <argument>/var/www/app/vendor/symfony/monolog-bundle/translations</argument>
+          <argument>/var/www/app/vendor/symfony/monolog-bundle/src/translations</argument>
           <argument>/var/www/app/vendor/symfony/maker-bundle/translations</argument>
         </argument>
         <argument key="cache_vary" type="collection">
@@ -2461,7 +2460,7 @@
             <argument>vendor/symfony/ux-turbo/translations</argument>
             <argument>vendor/twig/extra-bundle/translations</argument>
             <argument>vendor/symfony/security-bundle/translations</argument>
-            <argument>vendor/symfony/monolog-bundle/translations</argument>
+            <argument>vendor/symfony/monolog-bundle/src/translations</argument>
             <argument>vendor/symfony/maker-bundle/translations</argument>
           </argument>
         </argument>
@@ -7300,6 +7299,7 @@
       </call>
     </service>
     <service id="monolog.logger" class="Monolog\Logger">
+      <tag name="monolog.channel_logger"/>
       <argument>app</argument>
       <call method="useMicrosecondTimestamps">
         <argument>true</argument>
@@ -7313,16 +7313,15 @@
       <configurator service="debug.debug_logger_configurator" method="pushDebugLogger"/>
     </service>
     <service id="monolog.logger_prototype" class="Monolog\Logger" abstract="true">
-      <argument></argument>
+      <argument type="abstract">channel</argument>
       <configurator service="debug.debug_logger_configurator" method="pushDebugLogger"/>
     </service>
-    <service id="monolog.activation_strategy.not_found" class="Symfony\Bridge\Monolog\Handler\FingersCrossed\NotFoundActivationStrategy" abstract="true"/>
-    <service id="monolog.handler.fingers_crossed.error_level_activation_strategy" class="Monolog\Handler\FingersCrossed\ErrorLevelActivationStrategy" abstract="true"/>
     <service id="monolog.formatter.chrome_php" class="Monolog\Formatter\ChromePHPFormatter"/>
     <service id="monolog.formatter.gelf_message" class="Monolog\Formatter\GelfMessageFormatter"/>
     <service id="monolog.formatter.html" class="Monolog\Formatter\HtmlFormatter"/>
     <service id="monolog.formatter.json" class="Monolog\Formatter\JsonFormatter"/>
     <service id="monolog.formatter.line" class="Monolog\Formatter\LineFormatter"/>
+    <service id="monolog.formatter.syslog" class="Monolog\Formatter\SyslogFormatter"/>
     <service id="monolog.formatter.loggly" class="Monolog\Formatter\LogglyFormatter"/>
     <service id="monolog.formatter.normalizer" class="Monolog\Formatter\NormalizerFormatter"/>
     <service id="monolog.formatter.scalar" class="Monolog\Formatter\ScalarFormatter"/>
@@ -7353,6 +7352,7 @@
       <argument>true</argument>
       <argument type="collection"/>
       <argument type="collection"/>
+      <argument>false</argument>
     </service>
     <service id="maker.file_manager" class="Symfony\Bundle\MakerBundle\FileManager">
       <argument type="service" id="filesystem"/>
@@ -8549,6 +8549,7 @@
       <argument type="collection"/>
     </service>
     <service id="monolog.logger.request" class="Monolog\Logger">
+      <tag name="monolog.channel_logger"/>
       <argument>request</argument>
       <call method="pushHandler">
         <argument type="service" id="monolog.handler.console"/>
@@ -8559,6 +8560,7 @@
       <configurator service="debug.debug_logger_configurator" method="pushDebugLogger"/>
     </service>
     <service id="monolog.logger.console" class="Monolog\Logger">
+      <tag name="monolog.channel_logger"/>
       <argument>console</argument>
       <call method="pushHandler">
         <argument type="service" id="monolog.handler.main"/>
@@ -8566,6 +8568,7 @@
       <configurator service="debug.debug_logger_configurator" method="pushDebugLogger"/>
     </service>
     <service id="monolog.logger.messenger" class="Monolog\Logger">
+      <tag name="monolog.channel_logger"/>
       <argument>messenger</argument>
       <call method="pushHandler">
         <argument type="service" id="monolog.handler.console"/>
@@ -8576,6 +8579,7 @@
       <configurator service="debug.debug_logger_configurator" method="pushDebugLogger"/>
     </service>
     <service id="monolog.logger.cache" class="Monolog\Logger">
+      <tag name="monolog.channel_logger"/>
       <argument>cache</argument>
       <call method="pushHandler">
         <argument type="service" id="monolog.handler.console"/>
@@ -8586,6 +8590,7 @@
       <configurator service="debug.debug_logger_configurator" method="pushDebugLogger"/>
     </service>
     <service id="monolog.logger.asset_mapper" class="Monolog\Logger">
+      <tag name="monolog.channel_logger"/>
       <argument>asset_mapper</argument>
       <call method="pushHandler">
         <argument type="service" id="monolog.handler.console"/>
@@ -8596,6 +8601,7 @@
       <configurator service="debug.debug_logger_configurator" method="pushDebugLogger"/>
     </service>
     <service id="monolog.logger.http_client" class="Monolog\Logger">
+      <tag name="monolog.channel_logger"/>
       <argument>http_client</argument>
       <call method="pushHandler">
         <argument type="service" id="monolog.handler.console"/>
@@ -8606,6 +8612,7 @@
       <configurator service="debug.debug_logger_configurator" method="pushDebugLogger"/>
     </service>
     <service id="monolog.logger.mailer" class="Monolog\Logger">
+      <tag name="monolog.channel_logger"/>
       <argument>mailer</argument>
       <call method="pushHandler">
         <argument type="service" id="monolog.handler.console"/>
@@ -8616,6 +8623,7 @@
       <configurator service="debug.debug_logger_configurator" method="pushDebugLogger"/>
     </service>
     <service id="monolog.logger.translation" class="Monolog\Logger">
+      <tag name="monolog.channel_logger"/>
       <argument>translation</argument>
       <call method="pushHandler">
         <argument type="service" id="monolog.handler.console"/>
@@ -8626,6 +8634,7 @@
       <configurator service="debug.debug_logger_configurator" method="pushDebugLogger"/>
     </service>
     <service id="monolog.logger.php" class="Monolog\Logger">
+      <tag name="monolog.channel_logger"/>
       <argument>php</argument>
       <call method="pushHandler">
         <argument type="service" id="monolog.handler.console"/>
@@ -8636,13 +8645,12 @@
       <configurator service="debug.debug_logger_configurator" method="pushDebugLogger"/>
     </service>
     <service id="monolog.logger.event" class="Monolog\Logger">
+      <tag name="monolog.channel_logger"/>
       <argument>event</argument>
-      <call method="pushHandler">
-        <argument type="service" id="monolog.handler.null_internal"/>
-      </call>
       <configurator service="debug.debug_logger_configurator" method="pushDebugLogger"/>
     </service>
     <service id="monolog.logger.router" class="Monolog\Logger">
+      <tag name="monolog.channel_logger"/>
       <argument>router</argument>
       <call method="pushHandler">
         <argument type="service" id="monolog.handler.console"/>
@@ -8653,6 +8661,7 @@
       <configurator service="debug.debug_logger_configurator" method="pushDebugLogger"/>
     </service>
     <service id="monolog.logger.profiler" class="Monolog\Logger">
+      <tag name="monolog.channel_logger"/>
       <argument>profiler</argument>
       <call method="pushHandler">
         <argument type="service" id="monolog.handler.console"/>
@@ -8663,6 +8672,7 @@
       <configurator service="debug.debug_logger_configurator" method="pushDebugLogger"/>
     </service>
     <service id="monolog.logger.doctrine" class="Monolog\Logger">
+      <tag name="monolog.channel_logger"/>
       <argument>doctrine</argument>
       <call method="pushHandler">
         <argument type="service" id="monolog.handler.main"/>
@@ -8670,6 +8680,7 @@
       <configurator service="debug.debug_logger_configurator" method="pushDebugLogger"/>
     </service>
     <service id="monolog.logger.debug" class="Monolog\Logger">
+      <tag name="monolog.channel_logger"/>
       <argument>debug</argument>
       <call method="pushHandler">
         <argument type="service" id="monolog.handler.console"/>
@@ -8680,6 +8691,7 @@
       <configurator service="debug.debug_logger_configurator" method="pushDebugLogger"/>
     </service>
     <service id="monolog.logger.security" class="Monolog\Logger">
+      <tag name="monolog.channel_logger"/>
       <argument>security</argument>
       <call method="pushHandler">
         <argument type="service" id="monolog.handler.console"/>
@@ -8690,6 +8702,7 @@
       <configurator service="debug.debug_logger_configurator" method="pushDebugLogger"/>
     </service>
     <service id="monolog.logger.deprecation" class="Monolog\Logger" public="true">
+      <tag name="monolog.channel_logger"/>
       <argument>deprecation</argument>
       <call method="pushHandler">
         <argument type="service" id="monolog.handler.console"/>
@@ -8699,7 +8712,6 @@
       </call>
       <configurator service="debug.debug_logger_configurator" method="pushDebugLogger"/>
     </service>
-    <service id="monolog.handler.null_internal" class="Monolog\Handler\NullHandler"/>
     <service id=".service_locator.ILdUWIS" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
@@ -10383,23 +10395,37 @@
     <service id="argument_resolver.controller_locator" alias=".service_locator.vbSAKRo"/>
     <service id="doctrine.id_generator_locator" alias=".service_locator.BxSdgVt"/>
     <service id="twig.loader" alias="twig.loader.native_filesystem"/>
+    <service id=".Psr\Log\LoggerInterface $request.logger" alias="monolog.logger.request"/>
     <service id="Psr\Log\LoggerInterface $requestLogger" alias="monolog.logger.request"/>
+    <service id=".Psr\Log\LoggerInterface $console.logger" alias="monolog.logger.console"/>
     <service id="Psr\Log\LoggerInterface $consoleLogger" alias="monolog.logger.console"/>
+    <service id=".Psr\Log\LoggerInterface $messenger.logger" alias="monolog.logger.messenger"/>
     <service id="Psr\Log\LoggerInterface $messengerLogger" alias="monolog.logger.messenger"/>
+    <service id=".Psr\Log\LoggerInterface $cache.logger" alias="monolog.logger.cache"/>
     <service id="Psr\Log\LoggerInterface $cacheLogger" alias="monolog.logger.cache"/>
-    <service id=".Psr\Log\LoggerInterface $asset_mapperLogger" alias="monolog.logger.asset_mapper"/>
+    <service id=".Psr\Log\LoggerInterface $asset_mapper.logger" alias="monolog.logger.asset_mapper"/>
     <service id="Psr\Log\LoggerInterface $assetMapperLogger" alias="monolog.logger.asset_mapper"/>
-    <service id=".Psr\Log\LoggerInterface $http_clientLogger" alias="monolog.logger.http_client"/>
+    <service id=".Psr\Log\LoggerInterface $http_client.logger" alias="monolog.logger.http_client"/>
     <service id="Psr\Log\LoggerInterface $httpClientLogger" alias="monolog.logger.http_client"/>
+    <service id=".Psr\Log\LoggerInterface $mailer.logger" alias="monolog.logger.mailer"/>
     <service id="Psr\Log\LoggerInterface $mailerLogger" alias="monolog.logger.mailer"/>
+    <service id=".Psr\Log\LoggerInterface $translation.logger" alias="monolog.logger.translation"/>
     <service id="Psr\Log\LoggerInterface $translationLogger" alias="monolog.logger.translation"/>
+    <service id=".Psr\Log\LoggerInterface $php.logger" alias="monolog.logger.php"/>
     <service id="Psr\Log\LoggerInterface $phpLogger" alias="monolog.logger.php"/>
+    <service id=".Psr\Log\LoggerInterface $event.logger" alias="monolog.logger.event"/>
     <service id="Psr\Log\LoggerInterface $eventLogger" alias="monolog.logger.event"/>
+    <service id=".Psr\Log\LoggerInterface $router.logger" alias="monolog.logger.router"/>
     <service id="Psr\Log\LoggerInterface $routerLogger" alias="monolog.logger.router"/>
+    <service id=".Psr\Log\LoggerInterface $profiler.logger" alias="monolog.logger.profiler"/>
     <service id="Psr\Log\LoggerInterface $profilerLogger" alias="monolog.logger.profiler"/>
+    <service id=".Psr\Log\LoggerInterface $doctrine.logger" alias="monolog.logger.doctrine"/>
     <service id="Psr\Log\LoggerInterface $doctrineLogger" alias="monolog.logger.doctrine"/>
+    <service id=".Psr\Log\LoggerInterface $debug.logger" alias="monolog.logger.debug"/>
     <service id="Psr\Log\LoggerInterface $debugLogger" alias="monolog.logger.debug"/>
+    <service id=".Psr\Log\LoggerInterface $security.logger" alias="monolog.logger.security"/>
     <service id="Psr\Log\LoggerInterface $securityLogger" alias="monolog.logger.security"/>
+    <service id=".Psr\Log\LoggerInterface $deprecation.logger" alias="monolog.logger.deprecation"/>
     <service id="Psr\Log\LoggerInterface $deprecationLogger" alias="monolog.logger.deprecation"/>
     <service id=".service_locator.xqODiDp" alias="messenger.receiver_locator"/>
     <service id=".service_locator.kVuTj7R" alias="messenger.retry_strategy_locator"/>
