@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Service\NewsService;
 use App\Service\WeatherService;
-// use App\Entity\Objectives; // à utiliser plus tard si besoin
+use App\Entity\Objective;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -44,35 +44,10 @@ class DashboardController extends AbstractController
             'news'     => $news,
             'keywords' => $keywords,
             'city'     => $city,
+            'objectives' => $objectives,
             'weather'  => $weather,
         ]);
     }
 
-    #[Route('/preference/edit', name: 'app_preference_edit')]
-    public function edit(
-        Request $request,
-        Security $security,
-        EntityManagerInterface $entityManager
-    ): Response {
-        /** @var \App\Entity\User $user */
-        $user = $security->getUser();
-
-        $form = $this->createForm(PreferenceType::class, $user);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            // Les données sont déjà mappées dans $user
-            $entityManager->flush();
-
-            // Redirection après succès
-            return $this->redirectToRoute('app_dashboard');
-            // ou vers une page de préférences :
-            // return $this->redirectToRoute('app_preference_edit');
-        }
-
-        return $this->render('preference/edit.html.twig', [
-            'user' => $user,
-            'form' => $form->createView(),
-        ]);
-    }
+    
 }

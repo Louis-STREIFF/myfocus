@@ -168,22 +168,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     public function setFavoriteKeywords(?string $favoriteKeywords): self
-{
-    if ($favoriteKeywords !== null) {
-        
-        $favoriteKeywords = trim($favoriteKeywords);
+    {
+        if ($favoriteKeywords !== null) {
+            
+            $favoriteKeywords = trim($favoriteKeywords);
 
-        $parts = preg_split('/[,\s]+/', $favoriteKeywords);
+            $parts = preg_split('/[,\s]+/', $favoriteKeywords);
 
-        $parts = array_filter($parts, fn ($v) => $v !== '');
+            $parts = array_filter($parts, fn ($v) => $v !== '');
 
-        $favoriteKeywords = implode(', ', $parts);
+            $favoriteKeywords = implode(', ', $parts);
+        }
+
+        $this->favoriteKeywords = $favoriteKeywords;
+
+        return $this;
     }
-
-    $this->favoriteKeywords = $favoriteKeywords;
-
-    return $this;
-}
 
 
     // ---------------------
@@ -246,4 +246,5 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+    
 }

@@ -3,7 +3,8 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block body %}
-<div class="container py-4">
+    <h1 class="mb-4"> Votre tableau de bord </h1>
+    <div class="container py-4">
     <h1 class="mb-4">Votre tableau de bord</h1>
 
     <div class="mb-4">
@@ -17,7 +18,7 @@
                 {% if keywords %}Mots-clés : <strong>{{ keywords }}</strong>{% endif %}
             </p>
         {% endif %}
-        <a href="{{ path('app_preference_edit') }}" class="btn btn-primary btn-sm mt-2">
+        <a href="{{ path('app_preference_update') }}" class="btn btn-primary btn-sm mt-2">
             Modifier mes préférences
         </a>
     </div>
@@ -28,7 +29,8 @@
         <div class="col-12 col-lg-4">
             <div class="card h-100">
                 <div class="card-header">
-                    Météo{% if city %} - {{ city }}{% endif %}
+                    {# Météo{% if city %} - {{ city }}{% endif %} #}
+                    Quel temps à {% if city %} {{city}}{% endif %} aujourd'hui?
                 </div>
                 <div class="card-body">
                     {% if weather %}
@@ -98,6 +100,47 @@
             </div>
         </div>
 
+        <div class="container py-4">
+            <h3 class="mb-4">Les objectifs du jour</h3>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Objectif</th>
+                        <th>Etat</th>
+                        <th>Date de réalisation</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for objective in objectives %}
+                        <tr>
+                            <td>{{ objective.label }}</td>
+
+                            <td>
+                                {% if objective.status %}
+                                    ✔ Fait
+                                {% else %}
+                                    ☐ À faire
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {% if objective.targetDate %}
+                                    {{ objective.targetDate|date('dd/mm/YYYY') }}
+
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="3">Aucun objectif pour aujourd'hui.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
     </div>
 </div>
+ 
+
 {% endblock %}
