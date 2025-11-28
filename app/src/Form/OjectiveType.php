@@ -14,11 +14,16 @@ class ObjectiveFormType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add ('label')
-            ->add ('status')
-            ->add ('targetDate', null, [
+            ->add('label', TextType::class, [
+                'attr' => ['placeholder' => 'Votre objectif']
+            ])
+            ->add('status', CheckboxType::class, [
+                'required' => true,
+            ])
+            ->add('targetDate', null, [
+                'required' => false,
                 'widget' => 'single_text',
-            ])  
+            ]) 
             ->add('createdAt', null, [
                 'widget' => 'single_text',
             ])

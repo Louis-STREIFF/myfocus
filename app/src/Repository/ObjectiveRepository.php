@@ -16,6 +16,24 @@ class ObjectiveRepository extends ServiceEntityRepository
         parent::__construct($registry, Objective::class);
     }
 
+    //liste des objectifs du jour (+date vide) et de l'utilisateur en cours
+    public function getDashboardObjectives($user): array
+    {
+        // Début et fin de journée
+        $startOfDay = new \DateTimeImmutable('today 00:00:00');
+        $endOfDay   = new \DateTimeImmutable('tomorrow 00:00:00');
+
+        return $this->createQueryBuilder('o')
+            ->andWhere('o.user = :user')
+            ->andWhere('(o.targetDate >= :startOfDay AND o.targetDate < :endOfDay) OR o.targetDate IS NULL')
+            ->setParameter('user', $user)
+            ->setParameter('startOfDay', $startOfDay)
+            ->setParameter('endOfDay', $endOfDay)
+            ->orderBy('o.createdAt', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
     //    /**
     //     * @return Lending[] Returns an array of Lending objects
     //     */

@@ -1,23 +1,139 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Préférences{% endblock %}
-
+{% block title %}Dashboard{% endblock %}
 {% block body %}
-    <div class="container">
-        <h1> Vos préférences actuellement chargées </h1>
-        <h3> La ville </h3>
-        <p> {{$user.city}}</p> 
-
-        <h3> Les centres d'intérêt </h3>
-        <p> {{$user.keywords}}</p>
-        
-        <h3> vos objectifs du jour </h3>           
-        <ul class="list-group">
-            {% for objective in {{$user.objectives}} %}
-                <li class="list-group-item">
-                    {{objective.label}} {% if objective.status %} FAIT {% else %} A FAIRE {% endif %}
-                </li>
-            {% endfor %}
-        </ul>
+  <form method="POST" action="{{ path('app_preference_update') }}">
+    {{ form_start(form) }}
+    
+    <!-- Section Informations Utilisateur -->
+    <h2>Mes Préférences</h2>
+    
+    <div>
+      <label for="user_city">Ville</label>
+      {{ form_widget(form.city) }}
+      {{ form_errors(form.city) }}
     </div>
+
+    <div>
+      <label for="user_favoriteKeywords">Mots-clés favoris</label>
+      {{ form_widget(form.favoriteKeywords) }}
+      {{ form_errors(form.favoriteKeywords) }}
+    </div>
+
+    <!-- Section Objectifs -->
+    <h2>Mes Objectifs</h2>
+    
+    <div id="objectives-container">
+      {% for key, objective in form.objectives %}
+        <div class="objective-row" data-index="{{ key }}">
+          <!-- Label -->
+          <div>
+            <label for="user_objectives_{{ key }}_label">Objectif</label>
+            {{ form_widget(form.objectives[key].label) }}
+            {{ form_errors(form.objectives[key].label) }}
+          </div>
+
+          <!-- Statut (checkbox) -->
+          <div>
+            <label>
+              {{ form_widget(form.objectives[key].done) }}
+              Fait
+            </label>
+            {{ form_errors(form.objectives[key].done) }}
+          </div>
+
+          <!-- Date cible -->
+          <div>
+            <label for="user_objectives_{{ key }}_targetDate">Date de réalisation</label>
+            <input 
+              type="date" 
+              name="user[objectives][{{ key }}][targetDate]" 
+              value="{{ form.objectives[key].targetDate.vars.value ? form.objectives[key].targetDate.vars.value|date('Y-m-d') : 'now'|date('Y-m-d') }}"
+            >
+            {{ form_errors(form.objectives[key].targetDate) }}
+          </div>
+
+          <!-- Bouton Supprimer -->
+          <button type="button" class="btn-delete-objective" data-index="{{ key }}">
+            Supprimer
+          </button>
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Bouton Ajouter un objectif -->
+    <button type="button" id="btn-add-objective">
+      Ajouter un objectif
+    </button>
+
+    <!-- Boutons Retour/Valider -->
+    <div>
+      <button type="button" id="btn-cancel">Retour</button>
+      <button type="submit" id="btn-submit">Valider</button>
+    </div>
+
+    {{ form_end(form) }}
+  </form>
+
+  <script>
+    // Bouton Retour
+    document.getElementById('btn-cancel').addEventListener('click', function() {
+      if (confirm('Êtes-vous sûr de vouloir annuler tous les changements ?')) {
+        window.history.back();
+      }
+    });
+
+    // Bouton Ajouter un objectif
+    document.getElementById('btn-add-objective').addEventListener('click', function() {
+      const container = document.getElementById('objectives-container');
+      const newIndex = container.children.length;
+      
+      const newRow = document.createElement('div');
+      newRow.className = 'objective-row';
+      newRow.dataset.index = newIndex;
+      newRow.innerHTML = `
+        <div>
+          <label for="user_objectives_${newIndex}_label">Label</label>
+          <input type="text" name="user[objectives][${newIndex}][label]" id="user_objectives_${newIndex}_label">
+        </div>
+
+        <div>
+          <label>
+            <input type="hidden" name="user[objectives][${newIndex}][done]" value="0">
+            <input type="checkbox" name="user[objectives][${newIndex}][done]" value="1">
+            Fait
+          </label>
+        </div>
+
+        <div>
+          <label for="user_objectives_${newIndex}_targetDate">Date cible</label>
+          <input type="date" name="user[objectives][${newIndex}][targetDate]" value="${new Date().toISOString().split('T')[0]}">
+        </div>
+
+        <button type="button" class="btn-delete-objective" data-index="${newIndex}">
+          Supprimer
+        </button>
+      `;
+      
+      container.appendChild(newRow);
+      attachDeleteHandlers();
+    });
+
+    // Attachement des événements de suppression
+    function attachDeleteHandlers() {
+      document.querySelectorAll('.btn-delete-objective').forEach(btn => {
+        btn.removeEventListener('click', deleteObjective);
+        btn.addEventListener('click', deleteObjective);
+      });
+    }
+
+    function deleteObjective(e) {
+      e.preventDefault();
+      const row = e.target.closest('.objective-row');
+      row.remove();
+    }
+
+    attachDeleteHandlers();
+  </script>
 {% endblock %}
+  
