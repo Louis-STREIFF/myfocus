@@ -1,25 +1,85 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}News{% endblock %}
+{% block title %}Dashboard{% endblock %}
 
 {% block body %}
 <div class="container py-4">
-    <h1 class="mb-4">News{% if keywords %} : {{ keywords }}{% endif %}</h1>
+    <h1 class="mb-4">Dashboard</h1>
 
-    {% if news is empty %}
-        <p class="text-muted">Aucune news trouvée. Configure tes mots clés dans ton profil.</p>
-    {% else %}
-        <ul class="list-group">
-            {% for article in news %}
-                <li class="list-group-item">
-                    <a href="{{ article.url }}" target="_blank" class="fw-bold">{{ article.title }}</a>
-                    <div class="text-muted small">
-                        {{ article.source.name }}
-                        — {{ article.publishedAt|date('d/m/Y H:i') }}
-                    </div>
-                </li>
-            {% endfor %}
-        </ul>
-    {% endif %}
+    <div class="row g-4">
+
+        {# Colonne Météo #}
+        <div class="col-12 col-lg-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    Météo
+                    {% if city %}
+                        - {{ city }}
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    {% if weather %}
+                        <h5 class="card-title">
+                            {{ weather.weather[0].description|capitalize }}
+                        </h5>
+                        <p class="card-text">
+                            Température : {{ weather.main.temp }} °C<br>
+                            Ressenti : {{ weather.main.feels_like }} °C<br>
+                            Humidité : {{ weather.main.humidity }} %
+                        </p>
+                    {% else %}
+                        <p class="text-muted mb-0">
+                            {% if not city %}
+                                Aucune ville configurée pour ton profil.
+                            {% else %}
+                                Météo indisponible pour le moment.
+                            {% endif %}
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        {# Colonne News #}
+        <div class="col-12 col-lg-8">
+            <div class="card h-100">
+                <div class="card-header">
+                    Dernières news
+                    {% if keywords %}
+                        — <span class="fw-normal">{{ keywords }}</span>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    {% if keywords is empty %}
+                        <p class="text-muted">
+                            Aucun mot-clé configuré pour ton profil.  
+                            Va mettre quelque chose dans <code>favorite_keywords</code> pour ton user.
+                        </p>
+                    {% elseif news is empty %}
+                        <p class="text-muted">
+                            Aucune news trouvée pour <strong>{{ keywords }}</strong>.
+                        </p>
+                    {% else %}
+                        <ul class="list-unstyled mb-0">
+                            {% for article in news %}
+                                <li class="mb-3">
+                                    <a href="{{ article.url }}" target="_blank" class="fw-semibold">
+                                        {{ article.title }}
+                                    </a>
+                                    <div class="text-muted small">
+                                        {{ article.source.name }} —
+                                        {% if article.publishedAt is defined %}
+                                            {{ article.publishedAt|date('d/m/Y H:i') }}
+                                        {% endif %}
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+    </div>
 </div>
 {% endblock %}
