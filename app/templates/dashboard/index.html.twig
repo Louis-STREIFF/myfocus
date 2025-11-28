@@ -3,9 +3,24 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block body %}
-<<<<<<< HEAD
 <div class="container py-4">
-    <h1 class="mb-4">Dashboard</h1>
+    <h1 class="mb-4">Votre tableau de bord</h1>
+
+    <div class="mb-4">
+        <h2 class="h4">
+            Bonjour {{ user.firstname }}{% if city %} de {{ city }}{% endif %}
+        </h2>
+        {% if city or keywords %}
+            <p class="text-muted mb-1">
+                {% if city %}Ville : <strong>{{ city }}</strong>{% endif %}
+                {% if city and keywords %} • {% endif %}
+                {% if keywords %}Mots-clés : <strong>{{ keywords }}</strong>{% endif %}
+            </p>
+        {% endif %}
+        <a href="{{ path('app_preference_edit') }}" class="btn btn-primary btn-sm mt-2">
+            Modifier mes préférences
+        </a>
+    </div>
 
     <div class="row g-4">
 
@@ -13,21 +28,23 @@
         <div class="col-12 col-lg-4">
             <div class="card h-100">
                 <div class="card-header">
-                    Météo
-                    {% if city %}
-                        - {{ city }}
-                    {% endif %}
+                    Météo{% if city %} - {{ city }}{% endif %}
                 </div>
                 <div class="card-body">
                     {% if weather %}
                         <h5 class="card-title">
                             {{ weather.weather[0].description|capitalize }}
                         </h5>
-                        <p class="card-text">
-                            Température : {{ weather.main.temp }} °C<br>
-                            Ressenti : {{ weather.main.feels_like }} °C<br>
-                            Humidité : {{ weather.main.humidity }} %
+                        <p class="card-text mb-2">
+                            <strong>Température :</strong> {{ weather.main.temp }} °C<br>
+                            <strong>Ressenti :</strong> {{ weather.main.feels_like }} °C<br>
+                            <strong>Humidité :</strong> {{ weather.main.humidity }} %
                         </p>
+                        {% if weather.wind is defined and weather.wind.speed is defined %}
+                            <p class="card-text mb-0">
+                                <strong>Vent :</strong> {{ weather.wind.speed }} m/s
+                            </p>
+                        {% endif %}
                     {% else %}
                         <p class="text-muted mb-0">
                             {% if not city %}
@@ -53,24 +70,24 @@
                 <div class="card-body">
                     {% if keywords is empty %}
                         <p class="text-muted">
-                            Aucun mot-clé configuré pour ton profil.  
-                            Va mettre quelque chose dans <code>favorite_keywords</code> pour ton user.
+                            Aucun mot-clé configuré pour ton profil.<br>
+                            Va renseigner des mots-clés dans tes préférences pour voir des news.
                         </p>
                     {% elseif news is empty %}
                         <p class="text-muted">
                             Aucune news trouvée pour <strong>{{ keywords }}</strong>.
                         </p>
                     {% else %}
-                        <ul class="list-unstyled mb-0">
+                        <ul class="list-group list-group-flush">
                             {% for article in news %}
-                                <li class="mb-3">
-                                    <a href="{{ article.url }}" target="_blank" class="fw-semibold">
+                                <li class="list-group-item">
+                                    <a href="{{ article.url }}" target="_blank" class="fw-semibold d-block">
                                         {{ article.title }}
                                     </a>
                                     <div class="text-muted small">
-                                        {{ article.source.name }} —
+                                        {{ article.source.name|default('Source inconnue') }}
                                         {% if article.publishedAt is defined %}
-                                            {{ article.publishedAt|date('d/m/Y H:i') }}
+                                            — {{ article.publishedAt|date('d/m/Y H:i') }}
                                         {% endif %}
                                     </div>
                                 </li>
@@ -83,44 +100,4 @@
 
     </div>
 </div>
-=======
-    <h1 class="mb-4"> Votre tableau de bord </h1>
-    <div class="container py-4"> 
-        <h2 class="mb-4">Bonjour {{ user.firstname }} de {{city}}</h2>
-        <h2 class="mb-4">{{city}} - {{ keywords }} </h2>
-        <a href="{{ path('app_preference_edit') }}"> Modifier mes préférences </a>
-    </div>
-    <div class="container py-4">
-        <h3 class="mb-4">News{% if keywords %} : {{ keywords }}{% endif %}</h3>
-        {% if news is empty %}
-            <p class="text-muted">Aucune news trouvée. Configure tes mots clés dans ton profil.</p>
-        {% else %}
-            <ul class="list-group">
-                {% for article in news %}
-                    <li class="list-group-item">
-                        <a href="{{ article.url }}" target="_blank" class="fw-bold">{{ article.title }}</a>
-                        <div class="text-muted small">
-                            {{ article.source.name }}
-                            — {{ article.publishedAt|date('d/m/Y H:i') }}
-                        </div>
-                    </li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    </div>
-    <div class="container py-4">
-        <h3 class="mb-4">Quel temps à {% if city %} {{city}}{% endif %} aujourd'hui?</h3>
-        {% if waether is empty %}
-            <p><strong>"Météo indisponible pour le moment"</p>
-        {% else %}
-            <div class="list-group">
-                <p><strong>Température :</strong> {{ weather.main.temp }}°C</p>
-                <p><strong>Ressenti :</strong> {{ weather.main.feels_like }}°C</p>
-                <p><strong>Humidité :</strong> {{ weather.main.humidity }}%</p>
-                <p><strong>Description :</strong> {{ weather.weather[0].description }}</p>
-                <p><strong>Vitesse du vent :</strong> {{ weather.wind.speed }} m/s</p>                                                                                                                      
-            </div>
-        {% endif %}
-    </div>
->>>>>>> origin/isabelle
 {% endblock %}

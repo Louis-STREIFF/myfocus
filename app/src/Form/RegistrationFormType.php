@@ -8,6 +8,7 @@ use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -17,12 +18,12 @@ class RegistrationFormType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('firstname',[
-               'label' => 'Prénom: ',
+            ->add('firstname', TextType::class, [
+               'label' => 'Prénom :',
             ])
-            ->add('lastname',[
-               'label' => 'Nom: ',
-            ])            
+            ->add('lastname', TextType::class, [
+               'label' => 'Nom :',
+            ])
             ->add('email', EmailType::class, [
                 'constraints' => [
                     new Assert\NotBlank(),
@@ -34,14 +35,13 @@ class RegistrationFormType extends AbstractType
                 'label' => 'Mots-clés favoris (pour les news)',
                 'help' => 'Ex : symfony, docker, php',
             ])
-            ->add('city',[
+            ->add('city', TextType::class, [
                 'required' => false,
-                'label' => 'Votre ville: ',
-                'help' => 'Ex : symfony, docker, php',
+                'label' => 'Votre ville :',
             ])
             ->add('plainPassword', RepeatedType::class, [
-                'type' => PasswordType::class,
-                'mapped' => false,
+                'type'           => PasswordType::class,
+                'mapped'         => false,
                 'first_options'  => [
                     'label' => 'Mot de passe',
                 ],
@@ -53,7 +53,8 @@ class RegistrationFormType extends AbstractType
                     new Assert\NotBlank(),
                     new Assert\Length(min: 6),
                 ],
-            ]);
+            ])
+        ;
     }
 
     public function configureOptions(OptionsResolver $resolver): void

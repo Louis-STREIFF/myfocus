@@ -3,13 +3,14 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
 #[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
@@ -18,7 +19,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 180)]
+    #[ORM\Column(length: 180, unique: true)]
     private ?string $email = null;
 
     /**
@@ -33,27 +34,31 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?string $password = null;
 
-    #[ORM\Column]
+    #[ORM\Column(length: 255)]
     private ?string $firstname = null;
 
-    #[ORM\Column]
+    #[ORM\Column(length: 255)]
     private ?string $lastname = null;
 
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $favoriteKeywords = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $city = null;
 
-    //constructeurs
+    /**
+     * @var Collection<int, Objective>
+     */
+    #[ORM\OneToMany(targetEntity: Objective::class, mappedBy: 'user', orphanRemoval: true)]
+    private Collection $objectives;
+
     public function __construct()
     {
         $this->objectives = new ArrayCollection();
     }
 
-
     // ---------------------
-    // Getters / Setters
+    // Getters / Setters de base
     // ---------------------
 
     public function getId(): ?int
@@ -118,6 +123,41 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    #[\Deprecated]
+    public function eraseCredentials(): void
+    {
+        // @deprecated, will be removed in Symfony 8
+        // Si tu stockes du plainPassword, nettoie-le ici
+    }
+
+    // ---------------------
+    // Prénom / Nom
+    // ---------------------
+
+    public function getFirstname(): ?string
+    {
+        return $this->firstname;
+    }
+
+    public function setFirstname(?string $firstname): self
+    {
+        $this->firstname = $firstname;
+
+        return $this;
+    }
+
+    public function getLastname(): ?string
+    {
+        return $this->lastname;
+    }
+
+    public function setLastname(?string $lastname): self
+    {
+        $this->lastname = $lastname;
+
+        return $this;
+    }
+
     // ---------------------
     // Favorite Keywords
     // ---------------------
@@ -128,12 +168,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     public function setFavoriteKeywords(?string $favoriteKeywords): self
-    {
-        $this->favoriteKeywords = $favoriteKeywords;
-        return $this;
+{
+    if ($favoriteKeywords !== null) {
+        
+        $favoriteKeywords = trim($favoriteKeywords);
+
+        $parts = preg_split('/[,\s]+/', $favoriteKeywords);
+
+        $parts = array_filter($parts, fn ($v) => $v !== '');
+
+        $favoriteKeywords = implode(', ', $parts);
     }
 
-    
+    $this->favoriteKeywords = $favoriteKeywords;
+
+    return $this;
+}
+
+
     // ---------------------
     // City
     // ---------------------
@@ -146,6 +198,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setCity(?string $city): self
     {
         $this->city = $city;
+
         return $this;
     }
 
@@ -155,25 +208,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function __serialize(): array
     {
         $data = (array) $this;
-        $data["\0".self::class."\0password"] = hash('crc32c', $this->password);
+        $data["\0".self::class."\0password"] = hash('crc32c', (string) $this->password);
 
         return $data;
     }
 
-    #[\Deprecated]
-    public function eraseCredentials(): void
-    {
-        // @deprecated, will be removed in Symfony 8
-    }
+    // ---------------------
+    // Objectives relation
+    // ---------------------
 
     /**
-    * @var Collection<int, Objective>
-    */
-    #[ORM\OneToMany(targetEntity: Objective::class, mappedBy: 'user', orphanRemoval: true)]
-    private Collection $objectives;
-
-    /**
-     * @return Collection<int, Ojectivev1>
+     * @return Collection<int, Objective>
      */
     public function getObjectives(): Collection
     {

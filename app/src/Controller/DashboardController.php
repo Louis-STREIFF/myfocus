@@ -4,16 +4,16 @@ namespace App\Controller;
 
 use App\Service\NewsService;
 use App\Service\WeatherService;
-<<<<<<< HEAD
-=======
-use App\Entity\Objectives;
+// use App\Entity\Objectives; // à utiliser plus tard si besoin
 
->>>>>>> origin/isabelle
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Doctrine\ORM\EntityManagerInterface;
+use App\Form\PreferenceType;
 
 #[IsGranted('ROLE_USER')]
 class DashboardController extends AbstractController
@@ -30,26 +30,15 @@ class DashboardController extends AbstractController
         // NEWS
         $keywords = $user->getFavoriteKeywords();
         $news = $newsService->getNewsForKeywords($keywords);
-<<<<<<< HEAD
 
         // MÉTÉO
-        // On part du principe que ton User a une méthode getCity()
-        $city = method_exists($user, 'getCity') ? $user->getCity() : null;
+        $city = $user->getCity();
         $weather = null;
 
-        if ($city && trim($city) !== '') {
+        if (!empty($city) && trim($city) !== '') {
             $weather = $weatherService->getWeatherByCity($city);
         }
 
-=======
-        $city = $user->getCity();
-        if (empty(trim($city ?? ''))) {
-            $wearther = new JsonResponse([], Response::HTTP_NO_CONTENT);
-        }else{
-            $weather = $weatherService->getWeatherByCity($city);
-        }
-           
->>>>>>> origin/isabelle
         return $this->render('dashboard/index.html.twig', [
             'user'     => $user,
             'news'     => $news,
@@ -60,36 +49,30 @@ class DashboardController extends AbstractController
     }
 
     #[Route('/preference/edit', name: 'app_preference_edit')]
-    public function edit(Request $request, Security $security, EntityManagerInterface $entityManager): Response {
+    public function edit(
+        Request $request,
+        Security $security,
+        EntityManagerInterface $entityManager
+    ): Response {
         /** @var \App\Entity\User $user */
-
         $user = $security->getUser();
 
         $form = $this->createForm(PreferenceType::class, $user);
         $form->handleRequest($request);
-        $edit = $request->request->has('validation');
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $user->setCity($form->get('city')->getData());
-            $user->setFavoriteKeywords($form->get('keywords')->getData());
-
-            /** loading user in database */
-            $entityManager->persist($user);
+            // Les données sont déjà mappées dans $user
             $entityManager->flush();
 
-            /** loading objectives in database */
-
-
-            return $this->render('preference/index.html.twig', [
-                'user'     => $user,
-
-            ]);
+            // Redirection après succès
+            return $this->redirectToRoute('app_dashboard');
+            // ou vers une page de préférences :
+            // return $this->redirectToRoute('app_preference_edit');
         }
 
         return $this->render('preference/edit.html.twig', [
             'user' => $user,
-            'form' => $form,
+            'form' => $form->createView(),
         ]);
-
     }
 }

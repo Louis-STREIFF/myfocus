@@ -3,7 +3,8 @@
 namespace App\Form;
 
 use App\Entity\Objective;
-
+use App\Entity\User;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -14,11 +15,11 @@ class ObjectiveFormType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add ('label')
-            ->add ('status')
-            ->add ('targetDate', null, [
+            ->add('label')
+            ->add('status')
+            ->add('targetDate', null, [
                 'widget' => 'single_text',
-            ])  
+            ])
             ->add('createdAt', null, [
                 'widget' => 'single_text',
             ])
@@ -26,7 +27,7 @@ class ObjectiveFormType extends AbstractType
                 'widget' => 'single_text',
             ])
             ->add('user', EntityType::class, [
-                'class' => User::class,
+                'class'        => User::class,
                 'choice_label' => 'id',
             ])
         ;
