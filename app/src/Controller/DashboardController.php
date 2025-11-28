@@ -9,8 +9,11 @@ use App\Entity\Objective;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Doctrine\ORM\EntityManagerInterface;
+use App\Form\PreferenceType;
 
 #[IsGranted('ROLE_USER')]
 class DashboardController extends AbstractController
@@ -24,17 +27,18 @@ class DashboardController extends AbstractController
         /** @var \App\Entity\User $user */
         $user = $security->getUser();
 
+        // NEWS
         $keywords = $user->getFavoriteKeywords();
         $news = $newsService->getNewsForKeywords($keywords);
+
+        // MÉTÉO
         $city = $user->getCity();
-        $objectives = $objectiveRepository->getDashboardObjectives($user);
-        
-        if (empty(trim($city ?? ''))) {
-            $wearther = new JsonResponse([], Response::HTTP_NO_CONTENT);
-        }else{
+        $weather = null;
+
+        if (!empty($city) && trim($city) !== '') {
             $weather = $weatherService->getWeatherByCity($city);
         }
-           
+
         return $this->render('dashboard/index.html.twig', [
             'user'     => $user,
             'news'     => $news,

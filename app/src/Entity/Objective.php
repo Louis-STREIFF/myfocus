@@ -8,7 +8,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: ObjectiveRepository::class)]
 
-class UserObjective
+class Objective
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
