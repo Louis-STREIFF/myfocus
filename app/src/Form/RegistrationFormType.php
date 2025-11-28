@@ -17,6 +17,12 @@ class RegistrationFormType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
+            ->add('firstname',[
+               'label' => 'Prénom: ',
+            ])
+            ->add('lastname',[
+               'label' => 'Nom: ',
+            ])            
             ->add('email', EmailType::class, [
                 'constraints' => [
                     new Assert\NotBlank(),
@@ -26,6 +32,11 @@ class RegistrationFormType extends AbstractType
             ->add('favoriteKeywords', TextareaType::class, [
                 'required' => false,
                 'label' => 'Mots-clés favoris (pour les news)',
+                'help' => 'Ex : symfony, docker, php',
+            ])
+            ->add('city',[
+                'required' => false,
+                'label' => 'Votre ville: ',
                 'help' => 'Ex : symfony, docker, php',
             ])
             ->add('plainPassword', RepeatedType::class, [

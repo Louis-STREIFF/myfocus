@@ -33,8 +33,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?string $password = null;
 
+    #[ORM\Column]
+    private ?string $firstname = null;
+
+    #[ORM\Column]
+    private ?string $lastname = null;
+
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $favoriteKeywords = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?string $city = null;
+
+    //constructeurs
+    public function __construct()
+    {
+        $this->objectives = new ArrayCollection();
+    }
+
 
     // ---------------------
     // Getters / Setters
@@ -117,6 +133,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    
+    // ---------------------
+    // City
+    // ---------------------
+
+    public function getCity(): ?string
+    {
+        return $this->city;
+    }
+
+    public function setCity(?string $city): self
+    {
+        $this->city = $city;
+        return $this;
+    }
+
     /**
      * Ensure password hash is not stored in session.
      */
@@ -132,5 +164,41 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function eraseCredentials(): void
     {
         // @deprecated, will be removed in Symfony 8
+    }
+
+    /**
+    * @var Collection<int, Objective>
+    */
+    #[ORM\OneToMany(targetEntity: Objective::class, mappedBy: 'user', orphanRemoval: true)]
+    private Collection $objectives;
+
+    /**
+     * @return Collection<int, Ojectivev1>
+     */
+    public function getObjectives(): Collection
+    {
+        return $this->objectives;
+    }
+
+    public function addObjective(Objective $objective): static
+    {
+        if (!$this->objectives->contains($objective)) {
+            $this->objectives->add($objective);
+            $objective->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeObjective(Objective $objective): static
+    {
+        if ($this->objectives->removeElement($objective)) {
+            // set the owning side to null (unless already changed)
+            if ($objective->getUser() === $this) {
+                $objective->setUser(null);
+            }
+        }
+
+        return $this;
     }
 }

@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Préférences{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <h1> Vos préférences actuellement chargées </h1>
+        <h3> La ville </h3>
+        <p> {{$user.city}}</p> 
+
+        <h3> Les centres d'intérêt </h3>
+        <p> {{$user.keywords}}</p>
+        
+        <h3> vos objectifs du jour </h3>           
+        <ul class="list-group">
+            {% for objective in {{$user.objectives}} %}
+                <li class="list-group-item">
+                    {{objective.label}} {% if objective.status %} FAIT {% else %} A FAIRE {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}
