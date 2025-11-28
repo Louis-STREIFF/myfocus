@@ -1,20 +1,90 @@
+{# templates/home/index.html.twig #}
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello HomeController!{% endblock %}
+{% block title %}Accueil{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+<div class="home-hero py-5">
+    <div class="container">
+        <div class="row align-items-center g-4">
+            {# Colonne gauche : texte + boutons #}
+            <div class="col-12 col-lg-6">
+                <h1 class="display-5 fw-bold mb-3">
+                    Bienvenue sur <span class="text-primary">MyFocus</span>
+                </h1>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+                {% if app.user %}
+                    <p class="lead mb-4">
+                        Heureux de te revoir,
+                        <strong>{{ app.user.firstname ?? app.user.email }}</strong>.
+                        Ton espace perso t’attend.
+                    </p>
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>/var/www/app/src/Controller/HomeController.php</code></li>
-        <li>Your template at <code>/var/www/app/templates/home/index.html.twig</code></li>
-    </ul>
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="{{ path('app_dashboard') }}" class="btn btn-primary btn-lg">
+                            Accéder à mon dashboard
+                        </a>
+                        <a href="{{ path('app_preference_edit') }}" class="btn btn-outline-light">
+                            Modifier mes préférences
+                        </a>
+                        <a href="{{ path('app_logout') }}" class="btn btn-outline-danger ms-lg-2">
+                            Me déconnecter
+                        </a>
+                    </div>
+                {% else %}
+                    <p class="lead mb-4">
+                        Centralise tes objectifs, suis la météo de ta ville
+                        et reste à jour sur les news qui t’intéressent.
+                        Crée un compte ou connecte-toi pour commencer.
+                    </p>
+
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="{{ path('app_register') }}" class="btn btn-primary btn-lg">
+                            Créer un compte
+                        </a>
+                        <a href="{{ path('app_login') }}" class="btn btn-outline-light btn-lg">
+                            Me connecter
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+
+            {# Colonne droite : cartes de features #}
+            <div class="col-12 col-lg-6">
+                <div class="home-card-grid">
+                    <div class="card home-card mb-3 text-white">
+                        <div class="card-body">
+                            <h5 class="card-title mb-2">Fil d’actualités personnalisé</h5>
+                            <p class="card-text mb-0">
+                                Configure tes mots-clés pour recevoir des news ciblées
+                                (ex. <code>javascript, php, symfony</code>).
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="card home-card mb-3 text-white">
+                        <div class="card-body">
+                            <h5 class="card-title mb-2">Météo de ta ville</h5>
+                            <p class="card-text mb-0">
+                                Renseigne ta ville dans tes préférences et récupère
+                                la météo en un coup d’œil sur ton dashboard.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="card home-card text-white">
+                        <div class="card-body">
+                            <h5 class="card-title mb-2">Objectifs &amp; focus</h5>
+                            <p class="card-text mb-0">
+                                Organise tes objectifs, garde une vue claire
+                                sur ce qui compte vraiment aujourd’hui.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
 </div>
 {% endblock %}
