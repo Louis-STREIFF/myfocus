@@ -1,18 +1,15 @@
 <?php
 
-// src/Form/PreferenceType.php
 namespace App\Form;
 
 use App\Entity\User;
-use App\Entity\Objective;
+use App\Form\ObjectiveFormType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
-use Symfony\Component\Form\Extension\Core\Type\DateType;
 
 class PreferenceType extends AbstractType
 {
@@ -21,17 +18,20 @@ class PreferenceType extends AbstractType
         $builder
             ->add('city', TextType::class, [
                 'required' => false,
-                'attr' => ['placeholder' => 'Entrez votre ville']
+                'attr' => ['placeholder' => 'Entrez votre ville'],
+                'label' => 'Ville',
             ])
             ->add('favoriteKeywords', TextareaType::class, [
                 'required' => false,
-                'attr' => ['placeholder' => 'Vos mots-clés favoris']
+                'attr' => ['placeholder' => 'Vos mots-clés favoris'],
+                'label' => 'Mots-clés favoris',
             ])
             ->add('objectives', CollectionType::class, [
-                'entry_type' => ObjectiveType::class,
+                'entry_type' => ObjectiveFormType::class,
                 'allow_add' => true,
                 'allow_delete' => true,
                 'by_reference' => false,
+                'label' => false,
             ]);
     }
 
