@@ -1,5 +1,5 @@
-
 <?php
+
 namespace App\Service;
 
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -15,23 +15,24 @@ class WeatherService
 
     public function getWeatherByCity(string $city, string $lang = 'fr'): array
     {
-        try {
-            $response = $this->httpClient->request('GET', self::WEATHER_API_URL, [
-                'query' => [
-                    'q' => $city,
-                    'appid' => $this->openweatherApiKey,
-                    'units' => 'metric',
-                    'lang'=> $lang,
-                ],
-            ]);
+            try {
+                    $response = $this->httpClient->request('GET', self::WEATHER_API_URL, [
+                        'query' => [
+                            'q' => $city,
+                            'appid' => $this->openweatherApiKey,
+                            'units' => 'metric',
+                            'lang' => $lang,
+                        ],
+                    ]);
 
-            if ($response->getStatusCode() === 200) {
-               $response->toArray();
-            }
-        } catch (\Exception $e) {
-            $reponse="Météo indisponible pour le moment";
-        }
-        return $reponse;
+                    if ($response->getStatusCode() === 200) {
+                        return $response->toArray();
+                    }
+
+                    throw new \Exception('Erreur API: Code ' . $response->getStatusCode());
+                } catch (\Exception $e) {
+                    throw new \Exception('Impossible de récupérer la météo: ' . $e->getMessage());
+                }
     }
 
     public function getWeatherByCoordinates(float $lat, float $lon, string $lang = 'fr'): array
@@ -48,11 +49,13 @@ class WeatherService
             ]);
 
             if ($response->getStatusCode() === 200) {
-                $response->toArray();
+                return $response->toArray();
             }
+
+            throw new \Exception('Erreur API: Code ' . $response->getStatusCode());
         } catch (\Exception $e) {
-            $reponse="Météo indisponible pour le moment";
+            throw new \Exception('Impossible de récupérer la météo: ' . $e->getMessage());
         }
-        return $reponse;
+
     }
 }

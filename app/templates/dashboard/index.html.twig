@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block body %}
+    <h1 class="mb-4"> Votre tableau de bord </h1>
+    <div class="container py-4"> 
+        <h2 class="mb-4">Bonjour {{ user.firstname }} de {{city}}</h2>
+        <h2 class="mb-4">{{city}} - {{ keywords }} </h2>
+        <a href="{{ path('app_preference_edit') }}"> Modifier mes préférences </a>
+    </div>
+    <div class="container py-4">
+        <h3 class="mb-4">News{% if keywords %} : {{ keywords }}{% endif %}</h3>
+        {% if news is empty %}
+            <p class="text-muted">Aucune news trouvée. Configure tes mots clés dans ton profil.</p>
+        {% else %}
+            <ul class="list-group">
+                {% for article in news %}
+                    <li class="list-group-item">
+                        <a href="{{ article.url }}" target="_blank" class="fw-bold">{{ article.title }}</a>
+                        <div class="text-muted small">
+                            {{ article.source.name }}
+                            — {{ article.publishedAt|date('d/m/Y H:i') }}
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+    <div class="container py-4">
+        <h3 class="mb-4">Quel temps à {% if city %} {{city}}{% endif %} aujourd'hui?</h3>
+        {% if waether is empty %}
+            <p><strong>"Météo indisponible pour le moment"</p>
+        {% else %}
+            <div class="list-group">
+                <p><strong>Température :</strong> {{ weather.main.temp }}°C</p>
+                <p><strong>Ressenti :</strong> {{ weather.main.feels_like }}°C</p>
+                <p><strong>Humidité :</strong> {{ weather.main.humidity }}%</p>
+                <p><strong>Description :</strong> {{ weather.weather[0].description }}</p>
+                <p><strong>Vitesse du vent :</strong> {{ weather.wind.speed }} m/s</p>                                                                                                                      
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
